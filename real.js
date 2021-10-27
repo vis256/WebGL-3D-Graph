@@ -82,7 +82,7 @@ graphNodes.forEach(nodeElem => {
 });
 // sphere = new THREE.Mesh( geometry, material );
 // scene.add( sphere );
-camera.position.z = 10;
+// camera.position.x = 10;
 
 // function renderCylinderInbetweenTwoNodes()
 
@@ -123,22 +123,25 @@ var cameraDistToCenter = 10;
 var parallelRot = 0;
 var perpendicularRot = 0;
 
-function rotateCamera(rot) {
-    console.log("old", camera.position);
-    if (rot == 'right') {
-        // var newc = -((Math.cos(parallelRot) * cameraDistToCenter) - cameraDistToCenter);
-        // var newx = newc / Math.tan(parallelRot);
-        // camera.position.z -= newc;
-        // camera.position.x -= newx;
-        // console.log("new", camera.position, newc, newx);
+// function moveCameraParallel() {
+//     console.log("old", camera.position);
+//     camera.position.x = cameraDistToCenter * Math.cos(parallelRot * 2 * Math.PI);
+//     camera.position.z = cameraDistToCenter * Math.sin(parallelRot * 2 * Math.PI);
+// }
 
-        camera.position.x = cameraDistToCenter * Math.cos(parallelRot * 2 * Math.PI);
-        camera.position.z = cameraDistToCenter * Math.sin(parallelRot * 2 * Math.PI);
-        camera.rotateY(-0.0125);
-    } else if (rot == 'left') {
-        camera.rotateY(0.002);
-        console.log(camera.rotation.y);
-    }
+// function moveCameraPerpendicular() {
+//     console.log("old", camera.position);
+//     camera.position.x = cameraDistToCenter * Math.cos(perpendicularRot * 2 * Math.PI);
+//     camera.position.y = cameraDistToCenter * Math.sin(perpendicularRot * 2 * Math.PI);
+// }
+
+function moveCamera() {
+    console.log("old", camera.position);
+
+    camera.position.x = cameraDistToCenter * Math.sin( parallelRot * (2 * Math.PI) ) * Math.cos(perpendicularRot * (2 * Math.PI));
+    camera.position.y = cameraDistToCenter * Math.sin(perpendicularRot * (2 * Math.PI));
+    camera.position.z = cameraDistToCenter * Math.cos( parallelRot * (2 * Math.PI) ) * Math.cos(perpendicularRot * (2 * Math.PI));
+
 }
 
 
@@ -146,18 +149,26 @@ function rotateCamera(rot) {
 function onkeydown(e) {
     // console.log(e.key);
     if (e.key == 'a') {
+        parallelRot -= 0.002;
+        camera.rotateY(-0.0125);
+    } 
+    if (e.key == 'd') {
         parallelRot += 0.002;
-        rotateCamera('left');
-        // camera.rotation.set(30, 0, 0);
-
-    } else if (e.key == 'd') {
-        parallelRot += 0.002;
-        // console.log("right");
-        rotateCamera("right");
+        camera.rotateY(0.0125);
     }
+    if (e.key == 'w') {
+        perpendicularRot += 0.002;
+        camera.rotateX(-0.0125);
+    }
+    if (e.key == 's') {
+        perpendicularRot -= 0.002;
+        camera.rotateX(0.0125);
+    }
+
+    moveCamera();
 }
 
-camera.rotateY(1/2 * Math.PI);
+// camera.rotateY(1/2 * Math.PI);
 
 document.addEventListener('keydown', onkeydown);
 
