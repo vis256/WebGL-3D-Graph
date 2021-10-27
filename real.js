@@ -1,6 +1,8 @@
+let id = 0;
 var graphNodes = [];
 class node {
     constructor(val, color, position, connectedTo) {
+        this.id = id++;
         this.val = val;
         this.color = color;
         this.position = position;
@@ -8,48 +10,37 @@ class node {
     }
 }
 
+
 //     y
 //     |
 //     |
 //     z-- --x
 
 function init() {
-    var x = new node(5, "#ffab33", new THREE.Vector3(2,0,0), []);
-    var y = new node(15, "#0455cd", new THREE.Vector3(0,0,0), []);
+    // var x = new node(5, "#ffab33", new THREE.Vector3(9,0,0), []);
+    // var y = new node(15, "#0455cd", new THREE.Vector3(0,0,0), []);
     // x.connectedTo.push(y);
-    graphNodes.push(x);
-    graphNodes.push(y);
+    graphNodes.push( new node(5, "#ffab33", new THREE.Vector3(9,0,0), []) );
+    graphNodes.push( new node(15, "#0455cd", new THREE.Vector3(0,0,0), []) );
+    graphNodes.push( new node(15, "#0455cd", new THREE.Vector3(4,5,0), []) );
+}
+
+function addEdge(x, y) {
+    let xnode = graphNodes.filter(
+        function valid(elem) { return elem.id == x; }
+    )[0];
+    let ynode = graphNodes.filter(
+        function valid(elem) { return elem.id == y; }
+    )[0];
+    xnode.connectedTo.push(ynode);
+    ynode.connectedTo.push(xnode);
 }
 
 init();
+addEdge(0, 1);
+addEdge(0, 2);
+addEdge(2, 1);
 
-class Graph {
-    constructor(size) {
-        let t = [];
-        let tt = [];
-        for (let i = 0; i < size; i++) {
-            tt.push(null);
-        }
-        for (let i = 0; i < size; i++) {
-            t.push(tt);
-        }
-        this.adjMatrix = t;
-        this.colors = tt;
-    }
-
-    addEdge(x, y) {
-        this.adjMatrix[x][y] = 1;
-        this.adjMatrix[y][x] = 1;
-    }
-
-    removeEdge(x, y) {
-        this.adjMatrix[x][y] = null;
-        this.adjMatrix[y][x] = null;
-    }
-}
-
-let graph = new Graph(5);
-graph.adjMatrix[0][1] = "TEST";
 
 
 
@@ -71,7 +62,7 @@ document.body.appendChild( renderer.domElement );
 graphNodes.forEach(nodeElem => {
     console.log("test");
     var geometry = new THREE.SphereGeometry();
-    var material = new THREE.MeshBasicMaterial( { color: nodeElem.color, wireframe: true } );
+    var material = new THREE.MeshBasicMaterial( { color: nodeElem.color } );
     var sphere = new THREE.Mesh(geometry, material);
     sphere.position.x = nodeElem.position.x;
     sphere.position.y = nodeElem.position.y;
@@ -91,15 +82,28 @@ function spreadSpheres() {
 }
 
 function createConnectionBetweenSpheres() {
+    let connections = [];
+    let points = [];
+    let fid, sid;
     const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-    const points = [];
-    points.push( new THREE.Vector3(0, 20, 0) );
-    points.push( new THREE.Vector3(0, -20, 0) );
+    for (let i = 0; i < graphNodes.length; i++) {
+        const node = graphNodes[i];
+        fid = node.id;
+        for (let j = 0; j < node.connectedTo.length; j++) {
+            points = [];
+            sid = node.connectedTo[j].id;
+            points.push( scene.children[i].position );
+            points.push( scene.children[j].position );
+            const geometry = new THREE.BufferGeometry().setFromPoints( points );
+            const line = new THREE.Line( geometry, material );
+            connections.push(line);
+        }
+    }
 
-    const geometry = new THREE.BufferGeometry().setFromPoints( points );
+    connections.forEach(conn => {
+        scene.add(conn);
+    });
 
-    const line = new THREE.Line( geometry, material );
-    scene.add(line);
 }
 
 
@@ -147,7 +151,7 @@ function moveCamera() {
 
 
 function onkeydown(e) {
-    // console.log(e.key);
+    console.log(e.key);
     if (e.key == 'a') {
         parallelRot -= 0.002;
         camera.rotateY(-0.0125);
@@ -163,6 +167,12 @@ function onkeydown(e) {
     if (e.key == 's') {
         perpendicularRot -= 0.002;
         camera.rotateX(0.0125);
+    }
+    if (e.key == '=') {
+        cameraDistToCenter += 0.05;
+    }
+    if (e.key == '-') {
+        cameraDistToCenter -= 0.05;
     }
 
     moveCamera();
