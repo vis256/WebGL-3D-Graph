@@ -148,31 +148,34 @@ function moveCamera() {
 
 }
 
+const cameraRotationSpeed = 0.0125;
+const cameraSpeed = 0.002;
+const cameraZoomSpeed = 0.15;
 
 
 function onkeydown(e) {
     console.log(e.key);
     if (e.key == 'a') {
-        parallelRot -= 0.002;
-        camera.rotateY(-0.0125);
+        parallelRot -= cameraSpeed;
+        camera.rotateY(-cameraRotationSpeed);
     } 
     if (e.key == 'd') {
-        parallelRot += 0.002;
-        camera.rotateY(0.0125);
+        parallelRot += cameraSpeed;
+        camera.rotateY(cameraRotationSpeed);
     }
     if (e.key == 'w') {
-        perpendicularRot += 0.002;
-        camera.rotateX(-0.0125);
+        perpendicularRot += cameraSpeed;
+        camera.rotateX(-cameraRotationSpeed);
     }
     if (e.key == 's') {
-        perpendicularRot -= 0.002;
-        camera.rotateX(0.0125);
+        perpendicularRot -= cameraSpeed;
+        camera.rotateX(cameraRotationSpeed);
     }
     if (e.key == '=') {
-        cameraDistToCenter += 0.05;
+        cameraDistToCenter += cameraZoomSpeed;
     }
     if (e.key == '-') {
-        cameraDistToCenter -= 0.05;
+        cameraDistToCenter -= cameraZoomSpeed;
     }
 
     moveCamera();
