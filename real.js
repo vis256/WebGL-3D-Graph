@@ -16,6 +16,10 @@ class node {
 //     |
 //     z-- --x
 
+let raycaster = new THREE.Raycaster();
+let pointer = new THREE.Vector2;
+
+
 function init() {
     // var x = new node(5, "#ffab33", new THREE.Vector3(9,0,0), []);
     // var y = new node(15, "#0455cd", new THREE.Vector3(0,0,0), []);
@@ -152,20 +156,19 @@ function createConnectionBetweenSpheres() {
 
 }
 
+let INTERSECTED;
 
 function animate() {
 	requestAnimationFrame( animate );
-    var i = 1;
-    // rotateCamera('right')
-    // scene.children.forEach(sphere => {
-    //     i *= -1;
-    //     sphere.position.x += 0.01 * i;
-    //     sphere.position.y += 0.01 * i;
-    //     sphere.position.z += 0.01 * i;
-    //     sphere.rotation.x += 0.01;
-    //     sphere.rotation.y += 0.01;
-    // });  
-
+    const intersects = raycaster.intersectObjects( scene.children, false );
+    const startId = 10;
+    if (intersects.length > 0) {
+        if (INTERSECTED != intersects[0].object && INTERSECTED != null) {
+            INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+            INTERSECTED = intersects[0].object;
+            console.log(INTERSECTED);
+        }
+    }
 	renderer.render( scene, camera );
 }
 
@@ -194,7 +197,6 @@ function moveCamera() {
 
 }
 
-const cameraRotationSpeed = 0.0125;
 const cameraSpeed = 0.002;
 const cameraZoomSpeed = 0.15;
 
@@ -203,19 +205,15 @@ function onkeydown(e) {
     // console.log(e.key);
     if (e.key == 'a') {
         parallelRot -= cameraSpeed;
-        camera.rotateY(-cameraRotationSpeed);
     } 
     if (e.key == 'd') {
         parallelRot += cameraSpeed;
-        camera.rotateY(cameraRotationSpeed);
     }
     if (e.key == 'w') {
         perpendicularRot += cameraSpeed;
-        camera.rotateX(-cameraRotationSpeed);
     }
     if (e.key == 's') {
         perpendicularRot -= cameraSpeed;
-        camera.rotateX(cameraRotationSpeed);
     }
     if (e.key == '=') {
         cameraDistToCenter += cameraZoomSpeed;
@@ -225,11 +223,19 @@ function onkeydown(e) {
     }
 
     moveCamera();
+    camera.lookAt( new THREE.Vector3(0,0,0) );
+}
+
+
+function onpointermove(event) {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = (event.clientY / window.innerHeight) * 2 + 1;
 }
 
 // camera.rotateY(1/2 * Math.PI);
 
 document.addEventListener('keydown', onkeydown);
+document.addEventListener('pointermove', onpointermove);
 
 moveCamera();
 spreadSpheres();
