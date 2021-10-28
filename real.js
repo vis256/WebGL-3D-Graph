@@ -61,7 +61,8 @@ document.body.appendChild( renderer.domElement );
 // var sphere = new THREE.Mesh( geometry, material );
 graphNodes.forEach(nodeElem => {
     console.log("test");
-    var geometry = new THREE.SphereGeometry();
+    var geometry = new THREE.SphereGeometry(0.5, 8, 8);
+    console.log(geometry);
     var material = new THREE.MeshBasicMaterial( { color: nodeElem.color } );
     var sphere = new THREE.Mesh(geometry, material);
     sphere.position.x = nodeElem.position.x;
@@ -185,6 +186,6 @@ function onkeydown(e) {
 
 document.addEventListener('keydown', onkeydown);
 
-
+moveCamera();
 createConnectionBetweenSpheres();
 animate();
