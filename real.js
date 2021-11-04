@@ -1,14 +1,15 @@
 let id = 0;
 var graphNodes = [];
-class node {
-    constructor(val, color, position, connectedTo) {
-        this.id = id++;
-        this.val = val;
-        this.color = color;
-        this.position = position;
-        this.connectedTo = connectedTo;
-    }
-}
+let canvasSize = {x: 0, y: 0};
+// class node {
+//     constructor(val, color, position, connectedTo) {
+//         this.id = id++;
+//         this.val = val;
+//         this.color = color;
+//         this.position = position;
+//         this.connectedTo = connectedTo;
+//     }
+// }
 
 
 //     y
@@ -18,6 +19,7 @@ class node {
 
 let raycaster = new THREE.Raycaster();
 let pointer = new THREE.Vector2;
+const scene = new THREE.Scene();
 
 
 function init() {
@@ -39,28 +41,59 @@ function addDefaultNode() {
     graphNodes.push( new node(5, randomColor(), new THREE.Vector3(0, 0 ,0), []) );
 }
 
+function makeNewNode(color, x, size) {
+    const geometry = new THREE.SphereGeometry(0.5, 8, 8);
+    const material = new THREE.MeshBasicMaterial( { color: color } );
+    const sphere = new THREE.Mesh(geometry, material);
+
+    scene.add(sphere);
+
+    // create tooltip
+    const tooltip = document.createElement('div');
+    tooltip.innerText = x;
+    tooltip.classList = "tooltip";
+    tooltip.id = id;
+    document.body.appendChild(tooltip);
+
+    return {id: id++, elem: sphere, tooltip: tooltip, conn: []};
+}
+
+// function addEdge(x, y) {
+//     let xnode = graphNodes.filter(
+//         function valid(elem) { return elem.id == x; }
+//     )[0];
+//     let ynode = graphNodes.filter(
+//         function valid(elem) { return elem.id == y; }
+//     )[0];
+//     xnode.connectedTo.push(ynode);
+//     ynode.connectedTo.push(xnode);
+// }
+
 function addEdge(x, y) {
-    let xnode = graphNodes.filter(
-        function valid(elem) { return elem.id == x; }
-    )[0];
-    let ynode = graphNodes.filter(
-        function valid(elem) { return elem.id == y; }
-    )[0];
-    xnode.connectedTo.push(ynode);
-    ynode.connectedTo.push(xnode);
+    graphNodes[x].conn.push(y);
+    graphNodes[y].conn.push(x);
 }
 
 
 // init();
-addDefaultNode();
-addDefaultNode();
-addDefaultNode();
-addDefaultNode();
-addDefaultNode();
-addDefaultNode();
-addDefaultNode();
-addDefaultNode();
-addDefaultNode();
+// addDefaultNode();
+// addDefaultNode();
+// addDefaultNode();
+// addDefaultNode();
+// addDefaultNode();
+// addDefaultNode();
+// addDefaultNode();
+// addDefaultNode();
+// addDefaultNode();
+graphNodes.push( makeNewNode(randomColor(), 5, 10) );
+graphNodes.push( makeNewNode(randomColor(), 15, 10) );
+graphNodes.push( makeNewNode(randomColor(), 54, 10) );
+graphNodes.push( makeNewNode(randomColor(), 2, 10) );
+graphNodes.push( makeNewNode(randomColor(), 0, 10) );
+graphNodes.push( makeNewNode(randomColor(), -5, 10) );
+graphNodes.push( makeNewNode(randomColor(), 51, 10) );
+graphNodes.push( makeNewNode(randomColor(), 15, 10) );
+graphNodes.push( makeNewNode(randomColor(), 12, 10) );
 addEdge(0, 1);
 addEdge(0, 2);
 addEdge(2, 1);
@@ -73,7 +106,6 @@ addEdge(8, 1);
 
 
 
-const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
 
@@ -82,24 +114,14 @@ const controlsElement = document.querySelector("#controls");
 
 
 renderer.setSize( window.innerWidth - controlsElement.clientWidth, window.innerHeight - controlsElement.clientWidth);
+canvasSize.x =  window.innerWidth - controlsElement.clientWidth;
+canvasSize.y = window.innerHeight - controlsElement.clientWidth;
 document.body.appendChild( renderer.domElement );
 
 // const geometry = new THREE.SphereGeometry();
 // const material = new THREE.MeshBasicMaterial( { color: 0x999999 } );
 // var sphere = new THREE.Mesh( geometry, material );
-graphNodes.forEach(nodeElem => {
-    console.log("test");
-    var geometry = new THREE.SphereGeometry(0.5, 8, 8);
-    console.log(geometry);
-    var material = new THREE.MeshBasicMaterial( { color: nodeElem.color } );
-    var sphere = new THREE.Mesh(geometry, material);
-    sphere.position.x = nodeElem.position.x;
-    sphere.position.y = nodeElem.position.y;
-    sphere.position.z = nodeElem.position.z;
-    // console.log(sphere.position);
-    scene.add( sphere );
-    // sphere = new THREE.Mesh(geometry, material);
-});
+
 // sphere = new THREE.Mesh( geometry, material );
 // scene.add( sphere );
 // camera.position.x = 10;
@@ -110,7 +132,7 @@ function spreadSpheres() {
     let cycle = 1;
     const cubeHalfLength = 2;
     for (let i = 0; i < graphNodes.length; i++) {
-        const sphere = scene.children[i];
+        const sphere = graphNodes[i].elem;
         let sub = i % 8;
         if (sub == 0) cycle++;
         let x, y, z;
@@ -139,11 +161,11 @@ function createConnectionBetweenSpheres() {
     for (let i = 0; i < graphNodes.length; i++) {
         const node = graphNodes[i];
         fid = node.id;
-        for (let j = 0; j < node.connectedTo.length; j++) {
+        for (let j = 0; j < node.conn.length; j++) {
             points = [];
-            sid = node.connectedTo[j].id;
-            points.push( scene.children[i].position );
-            points.push( scene.children[j].position );
+            sid = node.conn[j];
+            points.push( graphNodes[i].elem.position );
+            points.push( graphNodes[j].elem.position );
             const geometry = new THREE.BufferGeometry().setFromPoints( points );
             const line = new THREE.Line( geometry, material );
             connections.push(line);
@@ -156,19 +178,19 @@ function createConnectionBetweenSpheres() {
 
 }
 
-let INTERSECTED;
+let INTERSECTED = null;
 
 function animate() {
 	requestAnimationFrame( animate );
-    const intersects = raycaster.intersectObjects( scene.children, false );
-    const startId = 10;
-    if (intersects.length > 0) {
-        if (INTERSECTED != intersects[0].object && INTERSECTED != null) {
-            INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-            INTERSECTED = intersects[0].object;
-            console.log(INTERSECTED);
-        }
-    }
+    // let intersects = raycaster.intersectObjects( scene.children, false );
+    // const startId = 10;
+    // if (intersects.length > 0) {
+    //     // if (INTERSECTED == null) INTERSECTED = intersects[0].object; console.log(INTERSECTED);
+    //     if (INTERSECTED != intersects[0].object) {
+    //         INTERSECTED = intersects[0].object;
+    //         console.log(INTERSECTED);
+    //     }
+    // }
 	renderer.render( scene, camera );
 }
 
@@ -188,6 +210,26 @@ var perpendicularRot = 0;
 //     camera.position.y = cameraDistToCenter * Math.sin(perpendicularRot * 2 * Math.PI);
 // }
 
+function createDataBoxes() {
+    
+}
+
+function updateDataBoxesPosition() {
+    let tempV = new THREE.Vector3();
+    for (let i = 0; i < graphNodes.length; i++) {
+        let sphere = graphNodes[i].elem;
+        let tooltip = document.getElementById(`${i}`);
+        sphere.getWorldPosition(tempV);
+        tempV.project(camera);
+        
+        const x = (tempV.x *  .5 + .5) * canvasSize.x;
+        const y = (tempV.y * -.5 + .5) * canvasSize.y;
+        // console.log(`TRANSFORM ${x} ${y}`);
+        tooltip.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+    }
+}
+
+
 function moveCamera() {
     // console.log("old", camera.position);
 
@@ -202,7 +244,7 @@ const cameraZoomSpeed = 0.15;
 
 
 function onkeydown(e) {
-    // console.log(e.key);
+    console.log(e.key);
     if (e.key == 'a') {
         parallelRot -= cameraSpeed;
     } 
@@ -223,6 +265,7 @@ function onkeydown(e) {
     }
 
     moveCamera();
+    updateDataBoxesPosition();
     camera.lookAt( new THREE.Vector3(0,0,0) );
 }
 
@@ -237,7 +280,7 @@ function onpointermove(event) {
 document.addEventListener('keydown', onkeydown);
 document.addEventListener('pointermove', onpointermove);
 
-moveCamera();
 spreadSpheres();
 createConnectionBetweenSpheres();
 animate();
+moveCamera();

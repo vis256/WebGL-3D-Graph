@@ -1,19 +1,32 @@
 body {
-    text-align : center;
-  }
-  canvas {
-    display : block;
-    width : 280px;
-    height : 210px;
-    margin : auto;
-    padding : 0;
-    border : none;
-    background-color : black;
-  }
-  button {
-    display : block;
-    font-size : inherit;
-    margin : auto;
-    padding : 0.6em;
-  }
+  text-align : center;
+}
+
+
+canvas {
+  display : block;
+  width : 280px;
+  height : 210px;
+  margin : auto;
+  padding : 0;
+  border : none;
+  background-color : black;
+}
+
+
+button {
+  display : block;
+  font-size : inherit;
+  margin : auto;
+  padding : 0.6em;
+}
   
+.tooltip {
+  position: absolute;  /* let us position them inside the container */
+  left: 0;             /* make their default position the top left of the container */
+  top: 0;
+  color: aliceblue;
+  z-index: 1000;
+  background: #45f;
+  opacity: 1 !important;
+}
