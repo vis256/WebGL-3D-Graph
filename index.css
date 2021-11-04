@@ -29,6 +29,6 @@ button {
   z-index: 1000;
   background: #35353591;
   opacity: 1 !important;
-  line-height: 0%;
+  line-height: 0% !important;
 
 }
