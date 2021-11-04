@@ -50,12 +50,21 @@ function makeNewNode(color, x, size) {
 
     // create tooltip
     const tooltip = document.createElement('div');
-    tooltip.innerText = x;
-    tooltip.classList = "tooltip";
+    const nodeValElem = document.createElement('p');
+    nodeValElem.innerText = x;
+
+    tooltip.classList = "tooltip d-flex flex-column";
     tooltip.id = id;
+
+    const connElemUl = document.createElement('p');
+    connElemUl.id = `${id}-li`;
+    connElemUl.innerText = '-> ';
+    tooltip.appendChild(nodeValElem);
+    tooltip.appendChild(connElemUl);
+
     document.body.appendChild(tooltip);
 
-    return {id: id++, elem: sphere, tooltip: tooltip, conn: []};
+    return {id: id++, elem: sphere, tooltip: tooltip, conn: [], val: x};
 }
 
 // function addEdge(x, y) {
@@ -72,6 +81,8 @@ function makeNewNode(color, x, size) {
 function addEdge(x, y) {
     graphNodes[x].conn.push(y);
     graphNodes[y].conn.push(x);
+    document.getElementById(`${x}-li`).innerText += `${graphNodes[y].val}, `;
+    document.getElementById(`${y}-li`).innerText += `${graphNodes[x].val}, `;
 }
 
 

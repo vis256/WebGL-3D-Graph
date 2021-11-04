@@ -27,6 +27,8 @@ button {
   top: 0;
   color: aliceblue;
   z-index: 1000;
-  background: #45f;
+  background: #35353591;
   opacity: 1 !important;
+  line-height: 0%;
+
 }
