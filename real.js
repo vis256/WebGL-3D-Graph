@@ -22,15 +22,6 @@ let pointer = new THREE.Vector2;
 const scene = new THREE.Scene();
 
 
-function init() {
-    // var x = new node(5, "#ffab33", new THREE.Vector3(9,0,0), []);
-    // var y = new node(15, "#0455cd", new THREE.Vector3(0,0,0), []);
-    // x.connectedTo.push(y);
-    graphNodes.push( new node(5, "#ffab33", new THREE.Vector3(9,0,0), []) );
-    graphNodes.push( new node(15, "#0455cd", new THREE.Vector3(0,0,0), []) );
-    graphNodes.push( new node(15, "#0995cd", new THREE.Vector3(4,5,0), []) );
-}
-
 const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 
 function randomColor() {
@@ -51,14 +42,14 @@ function makeNewNode(color, x, size) {
     // create tooltip
     const tooltip = document.createElement('div');
     const nodeValElem = document.createElement('p');
-    nodeValElem.innerText = x;
+    nodeValElem.innerHTML = `<strong>Value: </strong>${x}`;
 
-    tooltip.classList = "tooltip d-flex flex-column";
+    tooltip.classList = "tooltip";
     tooltip.id = id;
 
     const connElemUl = document.createElement('p');
     connElemUl.id = `${id}-li`;
-    connElemUl.innerText = '-> ';
+    connElemUl.innerText = '→ ';
     tooltip.appendChild(nodeValElem);
     tooltip.appendChild(connElemUl);
 
@@ -81,8 +72,8 @@ function makeNewNode(color, x, size) {
 function addEdge(x, y) {
     graphNodes[x].conn.push(y);
     graphNodes[y].conn.push(x);
-    document.getElementById(`${x}-li`).innerText += `${graphNodes[y].val}, `;
-    document.getElementById(`${y}-li`).innerText += `${graphNodes[x].val}, `;
+    document.getElementById(`${x}-li`).innerText += ` ${graphNodes[y].val}, `;
+    document.getElementById(`${y}-li`).innerText += ` ${graphNodes[x].val}, `;
 }
 
 
