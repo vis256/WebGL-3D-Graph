@@ -1,15 +1,7 @@
 let id = 0;
 var graphNodes = [];
 let canvasSize = {x: 0, y: 0};
-// class node {
-//     constructor(val, color, position, connectedTo) {
-//         this.id = id++;
-//         this.val = val;
-//         this.color = color;
-//         this.position = position;
-//         this.connectedTo = connectedTo;
-//     }
-// }
+
 
 
 //     y
@@ -17,7 +9,6 @@ let canvasSize = {x: 0, y: 0};
 //     |
 //     z-- --x
 
-let raycaster = new THREE.Raycaster();
 let pointer = new THREE.Vector2;
 const scene = new THREE.Scene();
 
@@ -28,9 +19,6 @@ function randomColor() {
     return '#' + genRanHex(6);
 }
 
-function addDefaultNode() {
-    graphNodes.push( new node(5, randomColor(), new THREE.Vector3(0, 0 ,0), []) );
-}
 
 function makeNewNode(color, x, size) {
     const geometry = new THREE.SphereGeometry(0.5, 8, 8);
@@ -42,51 +30,57 @@ function makeNewNode(color, x, size) {
     // create tooltip
     const tooltip = document.createElement('div');
     const nodeValElem = document.createElement('p');
-    nodeValElem.innerHTML = `<strong>Value: </strong>${x}`;
+    const nodePosElem = document.createElement('p');
+    let connElemUl = document.createElement('p');
+    const nodeId = document.createElement('h1');
 
-    tooltip.classList = "tooltip";
     tooltip.id = id;
+    connElemUl.id = `${id}-cn`;
+    nodeValElem.id = `${id}-vl`;
+    nodePosElem.id = `${id}-ps`;
+    nodeId.id = `${id}-id`;
 
-    const connElemUl = document.createElement('p');
-    connElemUl.id = `${id}-li`;
-    connElemUl.innerText = '→ ';
+    nodePosElem.innerHTML = `<strong>x</strong>: ${sphere.position.x} <strong>y</strong>: ${sphere.position.y} <strong>z</strong>: ${sphere.position.z} `;
+    nodeValElem.innerHTML = `<strong>Value: </strong>${x}`;
+    nodeId.innerHTML = id;
+
+    tooltip.classList = "tooltip vis-off";
+    nodeId.classList = "tooltip-id";
+
+    connElemUl.innerHTML = '→ ';
+    console.log(connElemUl);
     tooltip.appendChild(nodeValElem);
+    tooltip.appendChild(nodePosElem);
     tooltip.appendChild(connElemUl);
+    tooltip.appendChild(nodeId);
 
+    
     document.body.appendChild(tooltip);
 
     return {id: id++, elem: sphere, tooltip: tooltip, conn: [], val: x};
 }
 
-// function addEdge(x, y) {
-//     let xnode = graphNodes.filter(
-//         function valid(elem) { return elem.id == x; }
-//     )[0];
-//     let ynode = graphNodes.filter(
-//         function valid(elem) { return elem.id == y; }
-//     )[0];
-//     xnode.connectedTo.push(ynode);
-//     ynode.connectedTo.push(xnode);
-// }
 
 function addEdge(x, y) {
     graphNodes[x].conn.push(y);
     graphNodes[y].conn.push(x);
-    document.getElementById(`${x}-li`).innerText += ` ${graphNodes[y].val}, `;
-    document.getElementById(`${y}-li`).innerText += ` ${graphNodes[x].val}, `;
+    // console.log('before, ', document.getElementById(`${x}-cn`).innerText);
+    // console.log('before, ', document.getElementById(`${y}-cn`).innerText);
+    document.getElementById(`${x}-cn`).innerHTML += ` ${graphNodes[y].val}, `;
+    document.getElementById(`${y}-cn`).innerHTML += ` ${graphNodes[x].val}, `;
+    // console.log('after, ', document.getElementById(`${x}-cn`).innerText);
+    // console.log('after, ', document.getElementById(`${y}-cn`).innerText);
+}
+
+function createRandomEdges(p) {
+    for (let i = 0; i < graphNodes.length; i++) {
+        for (let j = i+1; j < graphNodes.length; j++) {
+            if (Math.random() < p) addEdge(i,j);
+        }
+    }
 }
 
 
-// init();
-// addDefaultNode();
-// addDefaultNode();
-// addDefaultNode();
-// addDefaultNode();
-// addDefaultNode();
-// addDefaultNode();
-// addDefaultNode();
-// addDefaultNode();
-// addDefaultNode();
 graphNodes.push( makeNewNode(randomColor(), 5, 10) );
 graphNodes.push( makeNewNode(randomColor(), 15, 10) );
 graphNodes.push( makeNewNode(randomColor(), 54, 10) );
@@ -94,18 +88,29 @@ graphNodes.push( makeNewNode(randomColor(), 2, 10) );
 graphNodes.push( makeNewNode(randomColor(), 0, 10) );
 graphNodes.push( makeNewNode(randomColor(), -5, 10) );
 graphNodes.push( makeNewNode(randomColor(), 51, 10) );
-graphNodes.push( makeNewNode(randomColor(), 15, 10) );
+graphNodes.push( makeNewNode(randomColor(), 14, 10) );
 graphNodes.push( makeNewNode(randomColor(), 12, 10) );
-addEdge(0, 1);
-addEdge(0, 2);
-addEdge(2, 1);
-addEdge(3, 1);
-addEdge(4, 5);
-addEdge(7, 8);
-addEdge(8, 1);
-
-
-
+graphNodes.push( makeNewNode(randomColor(), 13, 10) );
+graphNodes.push( makeNewNode(randomColor(), 16, 10) );
+graphNodes.push( makeNewNode(randomColor(), 17, 10) );
+graphNodes.push( makeNewNode(randomColor(), 18, 10) );
+graphNodes.push( makeNewNode(randomColor(), 19, 10) );
+graphNodes.push( makeNewNode(randomColor(), 20, 10) );
+graphNodes.push( makeNewNode(randomColor(), 21, 10) );
+graphNodes.push( makeNewNode(randomColor(), 22, 10) );
+graphNodes.push( makeNewNode(randomColor(), 23, 10) );
+graphNodes.push( makeNewNode(randomColor(), 24, 10) );
+graphNodes.push( makeNewNode(randomColor(), 25, 10) );
+graphNodes.push( makeNewNode(randomColor(), 26, 10) );
+// addEdge(0, 1);
+// addEdge(0, 2);
+// addEdge(2, 1);
+// addEdge(3, 1);
+// addEdge(4, 5);
+// addEdge(7, 8);
+// addEdge(8, 1);
+// addEdge(6, 1);
+createRandomEdges(0.05);
 
 
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -119,16 +124,6 @@ renderer.setSize( window.innerWidth - controlsElement.clientWidth, window.innerH
 canvasSize.x =  window.innerWidth - controlsElement.clientWidth;
 canvasSize.y = window.innerHeight - controlsElement.clientWidth;
 document.body.appendChild( renderer.domElement );
-
-// const geometry = new THREE.SphereGeometry();
-// const material = new THREE.MeshBasicMaterial( { color: 0x999999 } );
-// var sphere = new THREE.Mesh( geometry, material );
-
-// sphere = new THREE.Mesh( geometry, material );
-// scene.add( sphere );
-// camera.position.x = 10;
-
-// function renderCylinderInbetweenTwoNodes()
 
 function spreadSpheres() {
     let cycle = 1;
@@ -151,7 +146,7 @@ function spreadSpheres() {
         sphere.position.x = x * cycle;
         sphere.position.y = y * cycle;
         sphere.position.z = z * cycle;
-        console.log({x: x, y: y, z: z});
+        // console.log({x: x, y: y, z: z});
     }
 }
 
@@ -164,10 +159,11 @@ function createConnectionBetweenSpheres() {
         const node = graphNodes[i];
         fid = node.id;
         for (let j = 0; j < node.conn.length; j++) {
+            console.log({i:i, j:node.conn[j]});
             points = [];
             sid = node.conn[j];
             points.push( graphNodes[i].elem.position );
-            points.push( graphNodes[j].elem.position );
+            points.push( graphNodes[node.conn[j]].elem.position );
             const geometry = new THREE.BufferGeometry().setFromPoints( points );
             const line = new THREE.Line( geometry, material );
             connections.push(line);
@@ -231,6 +227,41 @@ function updateDataBoxesPosition() {
     }
 }
 
+function updateDataBoxesContent() {
+    for (let i = 0; i < graphNodes.length; i++) {
+        const node = graphNodes[i];
+        document.getElementById(`${i}-vl`).innerHTML = `<strong>Value: </strong>${node.val}`;
+        document.getElementById(`${i}-ps`).innerHTML = `<strong>x</strong>: ${node.elem.position.x} <strong>y</strong>: ${node.elem.position.y} <strong>z</strong>: ${node.elem.position.z} `;
+    }
+}
+
+function toggleDataBoxVis() {
+    let inp = document.querySelector("#vis-toggle-input").value;
+    if (document.getElementById(`${parseInt(inp)}`).classList.contains('vis-off')) {
+        document.getElementById(`${parseInt(inp)}`).classList = 'tooltip';
+    } else {
+        document.getElementById(`${parseInt(inp)}`).classList += 'vis-off';
+    }
+}
+
+function showDataBoxes() {
+    let arr = document.getElementsByClassName('tooltip');
+    for (let i = 0; i < arr.length; i++) {
+        const elem = arr[i];
+        elem.classList = 'tooltip';
+    }
+}
+
+function hideDataBoxes() {
+    let arr = document.getElementsByClassName('tooltip');
+    for (let i = 0; i < arr.length; i++) {
+        const elem = arr[i];
+        elem.classList += ' vis-off';
+    }  
+}
+
+
+
 
 function moveCamera() {
     // console.log("old", camera.position);
@@ -241,12 +272,12 @@ function moveCamera() {
 
 }
 
-const cameraSpeed = 0.002;
-const cameraZoomSpeed = 0.15;
+const cameraSpeed = 0.01;
+const cameraZoomSpeed = 0.30;
 
 
 function onkeydown(e) {
-    console.log(e.key);
+    // console.log(e.key);
     if (e.key == 'a') {
         parallelRot -= cameraSpeed;
     } 
@@ -265,10 +296,20 @@ function onkeydown(e) {
     if (e.key == '-') {
         cameraDistToCenter -= cameraZoomSpeed;
     }
+    if (e.key == ' ') {
+        showDataBoxes();
+    }
 
     moveCamera();
     updateDataBoxesPosition();
+    // updateDataBoxesContent();
     camera.lookAt( new THREE.Vector3(0,0,0) );
+}
+
+function onkeyup(e) {
+    if (e.key == ' ') {
+        hideDataBoxes();
+    }
 }
 
 
@@ -280,9 +321,15 @@ function onpointermove(event) {
 // camera.rotateY(1/2 * Math.PI);
 
 document.addEventListener('keydown', onkeydown);
+document.addEventListener('keyup', onkeyup);
 document.addEventListener('pointermove', onpointermove);
 
 spreadSpheres();
 createConnectionBetweenSpheres();
 animate();
 moveCamera();
+setTimeout(() => {
+    updateDataBoxesPosition();
+    updateDataBoxesContent();
+    // console.log("RGEGRRR");
+}, 1000);

@@ -1,5 +1,6 @@
 body {
   text-align : center;
+  overflow: hidden;
 }
 
 
@@ -11,6 +12,10 @@ canvas {
   padding : 0;
   border : none;
   background-color : black;
+}
+
+input {
+  width: 20px;
 }
 
 
@@ -25,10 +30,23 @@ button {
   position: absolute;  /* let us position them inside the container */
   left: 0;             /* make their default position the top left of the container */
   top: 0;
-  color: aliceblue;
+  color: #fff;
   z-index: 1000;
-  background: #35353591;
+  background: #35353561;
   opacity: 1 !important;
   line-height: 0% !important;
+  max-width: 125px;
+}
 
+.tooltip-id {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 11px;
+  color: #ffffff60;
+  font-weight: 1000;
+}
+
+.vis-off {
+  visibility: hidden;
 }
