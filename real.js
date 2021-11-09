@@ -3,7 +3,6 @@ var graphNodes = [];
 let canvasSize = {x: 0, y: 0};
 
 
-
 //     y
 //     |
 //     |
@@ -64,12 +63,9 @@ function makeNewNode(color, x, size) {
 function addEdge(x, y) {
     graphNodes[x].conn.push(y);
     graphNodes[y].conn.push(x);
-    // console.log('before, ', document.getElementById(`${x}-cn`).innerText);
-    // console.log('before, ', document.getElementById(`${y}-cn`).innerText);
+
     document.getElementById(`${x}-cn`).innerHTML += ` ${graphNodes[y].val}, `;
     document.getElementById(`${y}-cn`).innerHTML += ` ${graphNodes[x].val}, `;
-    // console.log('after, ', document.getElementById(`${x}-cn`).innerText);
-    // console.log('after, ', document.getElementById(`${y}-cn`).innerText);
 }
 
 function createRandomEdges(p) {
@@ -176,19 +172,9 @@ function createConnectionBetweenSpheres() {
 
 }
 
-let INTERSECTED = null;
 
 function animate() {
 	requestAnimationFrame( animate );
-    // let intersects = raycaster.intersectObjects( scene.children, false );
-    // const startId = 10;
-    // if (intersects.length > 0) {
-    //     // if (INTERSECTED == null) INTERSECTED = intersects[0].object; console.log(INTERSECTED);
-    //     if (INTERSECTED != intersects[0].object) {
-    //         INTERSECTED = intersects[0].object;
-    //         console.log(INTERSECTED);
-    //     }
-    // }
 	renderer.render( scene, camera );
 }
 
@@ -196,21 +182,7 @@ var cameraDistToCenter = 10;
 var parallelRot = 0;
 var perpendicularRot = 0;
 
-// function moveCameraParallel() {
-//     console.log("old", camera.position);
-//     camera.position.x = cameraDistToCenter * Math.cos(parallelRot * 2 * Math.PI);
-//     camera.position.z = cameraDistToCenter * Math.sin(parallelRot * 2 * Math.PI);
-// }
 
-// function moveCameraPerpendicular() {
-//     console.log("old", camera.position);
-//     camera.position.x = cameraDistToCenter * Math.cos(perpendicularRot * 2 * Math.PI);
-//     camera.position.y = cameraDistToCenter * Math.sin(perpendicularRot * 2 * Math.PI);
-// }
-
-function createDataBoxes() {
-    
-}
 
 function updateDataBoxesPosition() {
     let tempV = new THREE.Vector3();
