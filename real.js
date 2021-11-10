@@ -118,7 +118,7 @@ const renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 
 renderer.setSize( window.innerWidth - controlsElement.clientWidth, window.innerHeight);
-canvasSize.x =  window.innerWidth - controlsElement.clientWidth;
+canvasSize.x =  Xsize;
 canvasSize.y = window.innerHeight;
 document.body.appendChild( renderer.domElement );
 
@@ -193,7 +193,7 @@ function updateDataBoxesPosition() {
         sphere.getWorldPosition(tempV);
         tempV.project(camera);
         
-        const x = (tempV.x *  .5 + 0.75) * canvasSize.x;
+        const x = (tempV.x *  .5 + 0.5) * canvasSize.x + controlsElement.clientWidth;
         const y = (tempV.y * -.5 + .5) * canvasSize.y;
         // console.log(`TRANSFORM ${x} ${y}`);
         tooltip.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
