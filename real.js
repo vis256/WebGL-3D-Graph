@@ -170,7 +170,16 @@ function createConnectionBetweenSpheres() {
     connections.forEach(conn => {
         scene.add(conn);
     });
+}
 
+function createConnection(x, y) {
+    let points = [];
+    points.push( graphNodes[x].elem.position );
+    points.push( graphNodes[y].elem.position );
+    const geometry = new THREE.BufferGeometry().setFromPoints( points );
+    const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    const line = new THREE.Line( geometry, material )
+    scene.add(line);
 }
 
 
@@ -297,6 +306,8 @@ document.addEventListener('keydown', onkeydown);
 document.addEventListener('keyup', onkeyup);
 document.addEventListener('pointermove', onpointermove);
 
+// controls functions
+
 function newNodeCreate() {
     console.log("TE");
     const val = document.querySelector("#n-val").value;
@@ -306,6 +317,15 @@ function newNodeCreate() {
     }
     graphNodes.push( makeNewNode(color, val, 10) );
     spreadSpheres();
+}
+
+function newEdgeCreate() {
+    const x = document.querySelector('#e-x').value;
+    const y = document.querySelector('#e-y').value;
+    console.log({x:[x, typeof(x)], y:[y, typeof(y)]});
+    addEdge(x, y);
+    createConnection(x, y);
+    updateDataBoxesContent();
 }
 
 spreadSpheres();
