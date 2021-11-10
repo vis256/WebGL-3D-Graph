@@ -78,26 +78,26 @@ function createRandomEdges(p) {
 
 
 graphNodes.push( makeNewNode(randomColor(), 5, 10) );
-graphNodes.push( makeNewNode(randomColor(), 15, 10) );
-graphNodes.push( makeNewNode(randomColor(), 54, 10) );
-graphNodes.push( makeNewNode(randomColor(), 2, 10) );
-graphNodes.push( makeNewNode(randomColor(), 0, 10) );
-graphNodes.push( makeNewNode(randomColor(), -5, 10) );
-graphNodes.push( makeNewNode(randomColor(), 51, 10) );
-graphNodes.push( makeNewNode(randomColor(), 14, 10) );
-graphNodes.push( makeNewNode(randomColor(), 12, 10) );
-graphNodes.push( makeNewNode(randomColor(), 13, 10) );
-graphNodes.push( makeNewNode(randomColor(), 16, 10) );
-graphNodes.push( makeNewNode(randomColor(), 17, 10) );
-graphNodes.push( makeNewNode(randomColor(), 18, 10) );
-graphNodes.push( makeNewNode(randomColor(), 19, 10) );
-graphNodes.push( makeNewNode(randomColor(), 20, 10) );
-graphNodes.push( makeNewNode(randomColor(), 21, 10) );
-graphNodes.push( makeNewNode(randomColor(), 22, 10) );
-graphNodes.push( makeNewNode(randomColor(), 23, 10) );
-graphNodes.push( makeNewNode(randomColor(), 24, 10) );
-graphNodes.push( makeNewNode(randomColor(), 25, 10) );
-graphNodes.push( makeNewNode(randomColor(), 26, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 15, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 54, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 2, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 0, 10) );
+// graphNodes.push( makeNewNode(randomColor(), -5, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 51, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 14, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 12, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 13, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 16, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 17, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 18, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 19, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 20, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 21, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 22, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 23, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 24, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 25, 10) );
+// graphNodes.push( makeNewNode(randomColor(), 26, 10) );
 // addEdge(0, 1);
 // addEdge(0, 2);
 // addEdge(2, 1);
@@ -106,19 +106,20 @@ graphNodes.push( makeNewNode(randomColor(), 26, 10) );
 // addEdge(7, 8);
 // addEdge(8, 1);
 // addEdge(6, 1);
-createRandomEdges(0.05);
-
-
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-const renderer = new THREE.WebGLRenderer( { antialias: true } );
+// createRandomEdges(0.05);
 
 const controlsElement = document.querySelector("#controls");
+let Xsize = window.innerWidth - controlsElement.clientWidth;
+
+const camera = new THREE.PerspectiveCamera( 75, Xsize / window.innerHeight, 0.1, 1000 );
+const renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 
 
-renderer.setSize( window.innerWidth - controlsElement.clientWidth, window.innerHeight - controlsElement.clientWidth);
+
+renderer.setSize( window.innerWidth - controlsElement.clientWidth, window.innerHeight);
 canvasSize.x =  window.innerWidth - controlsElement.clientWidth;
-canvasSize.y = window.innerHeight - controlsElement.clientWidth;
+canvasSize.y = window.innerHeight;
 document.body.appendChild( renderer.domElement );
 
 function spreadSpheres() {
@@ -192,7 +193,7 @@ function updateDataBoxesPosition() {
         sphere.getWorldPosition(tempV);
         tempV.project(camera);
         
-        const x = (tempV.x *  .5 + .5) * canvasSize.x;
+        const x = (tempV.x *  .5 + 0.75) * canvasSize.x;
         const y = (tempV.y * -.5 + .5) * canvasSize.y;
         // console.log(`TRANSFORM ${x} ${y}`);
         tooltip.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
@@ -295,6 +296,17 @@ function onpointermove(event) {
 document.addEventListener('keydown', onkeydown);
 document.addEventListener('keyup', onkeyup);
 document.addEventListener('pointermove', onpointermove);
+
+function newNodeCreate() {
+    console.log("TE");
+    const val = document.querySelector("#n-val").value;
+    let color = document.querySelector("#n-color").value;
+    if (color == "") {
+        color = randomColor();
+    }
+    graphNodes.push( makeNewNode(color, val, 10) );
+    spreadSpheres();
+}
 
 spreadSpheres();
 createConnectionBetweenSpheres();
