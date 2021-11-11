@@ -1,6 +1,21 @@
+// init
+const controlsElement = document.querySelector("#controls");
+
+let Xsize = window.innerWidth - controlsElement.clientWidth;
+let Ysize = window.innerHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, Xsize / Ysize, 0.1, 1000 );
+const renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+
+renderer.setSize( Xsize, Ysize);
+document.body.appendChild( renderer.domElement );
+
 let id = 0;
 var graphNodes = [];
-let canvasSize = {x: 0, y: 0};
+let pointer = new THREE.Vector2;
+
 
 
 //     y
@@ -8,8 +23,6 @@ let canvasSize = {x: 0, y: 0};
 //     |
 //     z-- --x
 
-let pointer = new THREE.Vector2;
-const scene = new THREE.Scene();
 
 
 const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -108,19 +121,14 @@ graphNodes.push( makeNewNode(randomColor(), 5, 10) );
 // addEdge(6, 1);
 // createRandomEdges(0.05);
 
-const controlsElement = document.querySelector("#controls");
-let Xsize = window.innerWidth - controlsElement.clientWidth;
-
-const camera = new THREE.PerspectiveCamera( 75, Xsize / window.innerHeight, 0.1, 1000 );
-const renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 
 
 
-renderer.setSize( window.innerWidth - controlsElement.clientWidth, window.innerHeight);
-canvasSize.x =  Xsize;
-canvasSize.y = window.innerHeight;
-document.body.appendChild( renderer.domElement );
+
+
+
+
 
 function spreadSpheres() {
     let cycle = 1;
@@ -177,7 +185,7 @@ function createConnection(x, y) {
     points.push( graphNodes[x].elem.position );
     points.push( graphNodes[y].elem.position );
     const geometry = new THREE.BufferGeometry().setFromPoints( points );
-    const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    const material = new THREE.LineBasicMaterial( { color: 0xffff66 } );
     const line = new THREE.Line( geometry, material )
     scene.add(line);
 }
@@ -202,8 +210,8 @@ function updateDataBoxesPosition() {
         sphere.getWorldPosition(tempV);
         tempV.project(camera);
         
-        const x = (tempV.x *  .5 + 0.5) * canvasSize.x + controlsElement.clientWidth;
-        const y = (tempV.y * -.5 + .5) * canvasSize.y;
+        const x = (tempV.x *  .5 + 0.5) * Xsize + controlsElement.clientWidth;
+        const y = (tempV.y * -.5 + .5) * Ysize;
         // console.log(`TRANSFORM ${x} ${y}`);
         tooltip.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
     }
@@ -284,7 +292,6 @@ function onkeydown(e) {
 
     moveCamera();
     updateDataBoxesPosition();
-    // updateDataBoxesContent();
     camera.lookAt( new THREE.Vector3(0,0,0) );
 }
 
@@ -300,7 +307,6 @@ function onpointermove(event) {
     pointer.y = (event.clientY / window.innerHeight) * 2 + 1;
 }
 
-// camera.rotateY(1/2 * Math.PI);
 
 document.addEventListener('keydown', onkeydown);
 document.addEventListener('keyup', onkeyup);
@@ -320,9 +326,10 @@ function newNodeCreate() {
 }
 
 function newEdgeCreate() {
-    const x = document.querySelector('#e-x').value;
-    const y = document.querySelector('#e-y').value;
+    let x = document.querySelector('#e-x').value;
+    let y = document.querySelector('#e-y').value;
     console.log({x:[x, typeof(x)], y:[y, typeof(y)]});
+    if (typeof(x) == "string") x = parseInt(x); y = parseInt(y);
     addEdge(x, y);
     createConnection(x, y);
     updateDataBoxesContent();
@@ -335,5 +342,4 @@ moveCamera();
 setTimeout(() => {
     updateDataBoxesPosition();
     updateDataBoxesContent();
-    // console.log("RGEGRRR");
 }, 1000);
