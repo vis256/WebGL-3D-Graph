@@ -86,14 +86,17 @@ function addEdge(x, y) {
     elemy.conn.push(x);
 
     console.log(elemx);
-    document.getElementById(`${x}-cn`).innerHTML += ` ${elemy.val}, `;
-    document.getElementById(`${y}-cn`).innerHTML += ` ${elemx.val}, `;
+    document.getElementById(`${x}-cn`).innerHTML += ` ${elemy.val}[${elemy.id}], `;
+    document.getElementById(`${y}-cn`).innerHTML += ` ${elemx.val}[${elemy.id}], `;
 }
 
 function createRandomEdges(p) {
     for (let i = 0; i < graphNodes.length; i++) {
         for (let j = i+1; j < graphNodes.length; j++) {
-            if (Math.random() < p) addEdge(i,j);
+            if (Math.random() < p){
+                addEdge(i,j);
+                createConnection(i,j);
+            }
         }
     }
 }
