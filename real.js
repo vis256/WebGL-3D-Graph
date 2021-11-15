@@ -366,7 +366,7 @@ function removeNode() {
     function validId(elem) {
         return elem.id == id;
     }
-    
+
     function invalidId(elem) {
         return elem.id != id;
     }
@@ -376,15 +376,32 @@ function removeNode() {
 
     for (let i = 0; i < node.conn.length; i++) {
         const connnode = node.conn[i];
-
-        connnode.conn.filter( invalidId );
-        let key = [connnode.id, node.id].sort().join();
-        scene.remove(edges[key]);
+        // connnode.conn.filter( invalidId );
+        removeEdge(node, connnode);
 
     }
     scene.remove(node.elem);
     graphNodes = graphNodes.filter( invalidId );
     document.body.removeChild( document.getElementById(id));
+}
+
+function removeEdge(x, y) {
+    const invalidX = elem => {return elem.id != x}
+    const invalidY = elem => {return elem.id != y}
+    let key = [x.id, y.id].sort().join();
+    scene.remove(edges[key]);
+
+    x.conn.filter( invalidY );
+    y.conn.filter( invalidX );
+}
+
+function deleteEdge() {
+    const validX = elem => {return elem.id == x}
+    const validY = elem => {return elem.id == y}
+
+    let x = document.querySelector('#re-x').value;
+    let y = document.querySelector('#re-y').value;
+    removeEdge( graphNodes.filter(validX)[0], graphNodes.filter(validY)[0] );
 }
 
 spreadSpheres();
