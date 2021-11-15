@@ -14,6 +14,7 @@ document.body.appendChild( renderer.domElement );
 
 let id = 0;
 var graphNodes = [];
+let edges = {};
 let pointer = new THREE.Vector2;
 
 
@@ -82,12 +83,11 @@ function addEdge(x, y) {
     }
     let elemx = graphNodes.filter( validX )[0];
     let elemy = graphNodes.filter( validY )[0];
-    elemx.conn.push(y);
-    elemy.conn.push(x);
+    elemx.conn.push(elemy);
+    elemy.conn.push(elemx);
 
-    console.log(elemx);
     document.getElementById(`${x}-cn`).innerHTML += ` ${elemy.val}[${elemy.id}], `;
-    document.getElementById(`${y}-cn`).innerHTML += ` ${elemx.val}[${elemy.id}], `;
+    document.getElementById(`${y}-cn`).innerHTML += ` ${elemx.val}[${elemx.id}], `;
 }
 
 function createRandomEdges(p) {
@@ -180,7 +180,7 @@ function createConnectionBetweenSpheres() {
             points = [];
             sid = node.conn[j];
             points.push( graphNodes[i].elem.position );
-            points.push( graphNodes[node.conn[j]].elem.position );
+            points.push( node.conn[j].elem.position );
             const geometry = new THREE.BufferGeometry().setFromPoints( points );
             const line = new THREE.Line( geometry, material );
             connections.push(line);
@@ -210,6 +210,8 @@ function createConnection(x, y) {
     const geometry = new THREE.BufferGeometry().setFromPoints( points );
     const material = new THREE.LineBasicMaterial( { color: 0xffff66 } );
     const line = new THREE.Line( geometry, material )
+    let key = [x,y].sort().join();
+    edges[key] = line;
     scene.add(line);
 }
 
@@ -364,11 +366,22 @@ function removeNode() {
     function validId(elem) {
         return elem.id == id;
     }
+    
     function invalidId(elem) {
         return elem.id != id;
     }
 
+
     let node = graphNodes.filter( validId )[0];
+
+    for (let i = 0; i < node.conn.length; i++) {
+        const connnode = node.conn[i];
+
+        connnode.conn.filter( invalidId );
+        let key = [connnode.id, node.id].sort().join();
+        scene.remove(edges[key]);
+
+    }
     scene.remove(node.elem);
     graphNodes = graphNodes.filter( invalidId );
     document.body.removeChild( document.getElementById(id));
