@@ -68,17 +68,26 @@ function makeNewNode(color, x, size) {
 
     
     document.body.appendChild(tooltip);
-
+    // console.log({x:x});
     return {id: id++, elem: sphere, tooltip: tooltip, conn: [], val: x};
 }
 
 
 function addEdge(x, y) {
-    graphNodes[x].conn.push(y);
-    graphNodes[y].conn.push(x);
+    function validX(element) {
+        return element.id == x;
+    }
+    function validY(element) {
+        return element.id == y;
+    }
+    let elemx = graphNodes.filter( validX )[0];
+    let elemy = graphNodes.filter( validY )[0];
+    elemx.conn.push(y);
+    elemy.conn.push(x);
 
-    document.getElementById(`${x}-cn`).innerHTML += ` ${graphNodes[y].val}, `;
-    document.getElementById(`${y}-cn`).innerHTML += ` ${graphNodes[x].val}, `;
+    console.log(elemx);
+    document.getElementById(`${x}-cn`).innerHTML += ` ${elemy.val}, `;
+    document.getElementById(`${y}-cn`).innerHTML += ` ${elemx.val}, `;
 }
 
 function createRandomEdges(p) {
@@ -164,7 +173,7 @@ function createConnectionBetweenSpheres() {
         const node = graphNodes[i];
         fid = node.id;
         for (let j = 0; j < node.conn.length; j++) {
-            console.log({i:i, j:node.conn[j]});
+            // console.log({i:i, j:node.conn[j]});
             points = [];
             sid = node.conn[j];
             points.push( graphNodes[i].elem.position );
@@ -180,10 +189,21 @@ function createConnectionBetweenSpheres() {
     });
 }
 
+
 function createConnection(x, y) {
+    function validX(element) {
+        return element.id == x;
+    }
+    function validY(element) {
+        return element.id == y;
+    }
+
     let points = [];
-    points.push( graphNodes[x].elem.position );
-    points.push( graphNodes[y].elem.position );
+    let xelem = graphNodes.filter( validX )[0];
+    let yelem = graphNodes.filter( validY )[0];
+    // console.log({xelem: xelem, yelem: yelem});
+    points.push( xelem.elem.position );
+    points.push( yelem.elem.position );
     const geometry = new THREE.BufferGeometry().setFromPoints( points );
     const material = new THREE.LineBasicMaterial( { color: 0xffff66 } );
     const line = new THREE.Line( geometry, material )
@@ -206,7 +226,7 @@ function updateDataBoxesPosition() {
     let tempV = new THREE.Vector3();
     for (let i = 0; i < graphNodes.length; i++) {
         let sphere = graphNodes[i].elem;
-        let tooltip = document.getElementById(`${i}`);
+        let tooltip = document.getElementById(`${graphNodes[i].id}`);
         sphere.getWorldPosition(tempV);
         tempV.project(camera);
         
@@ -220,8 +240,8 @@ function updateDataBoxesPosition() {
 function updateDataBoxesContent() {
     for (let i = 0; i < graphNodes.length; i++) {
         const node = graphNodes[i];
-        document.getElementById(`${i}-vl`).innerHTML = `<strong>Value: </strong>${node.val}`;
-        document.getElementById(`${i}-ps`).innerHTML = `<strong>x</strong>: ${node.elem.position.x} <strong>y</strong>: ${node.elem.position.y} <strong>z</strong>: ${node.elem.position.z} `;
+        document.getElementById(`${node.id}-vl`).innerHTML = `<strong>Value: </strong>${node.val}`;
+        document.getElementById(`${node.id}-ps`).innerHTML = `<strong>x</strong>: ${node.elem.position.x} <strong>y</strong>: ${node.elem.position.y} <strong>z</strong>: ${node.elem.position.z} `;
     }
 }
 
@@ -315,7 +335,7 @@ document.addEventListener('pointermove', onpointermove);
 // controls functions
 
 function newNodeCreate() {
-    console.log("TE");
+    // console.log("TE");
     const val = document.querySelector("#n-val").value;
     let color = document.querySelector("#n-color").value;
     if (color == "") {
@@ -333,6 +353,22 @@ function newEdgeCreate() {
     addEdge(x, y);
     createConnection(x, y);
     updateDataBoxesContent();
+}
+
+function removeNode() {
+    const id = document.querySelector("#rn").value;
+
+    function validId(elem) {
+        return elem.id == id;
+    }
+    function invalidId(elem) {
+        return elem.id != id;
+    }
+
+    let node = graphNodes.filter( validId )[0];
+    scene.remove(node.elem);
+    graphNodes = graphNodes.filter( invalidId );
+    document.body.removeChild( document.getElementById(id));
 }
 
 spreadSpheres();
