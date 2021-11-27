@@ -54,6 +54,7 @@ button {
   font-weight: 1000;
 }
 
+
 .vis-off {
   visibility: hidden;
 }
@@ -102,4 +103,13 @@ button {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: space-evenly;
+}
+
+#helper {
+  position: absolute;
+  bottom: 20px;
+  width: 100vw;
+  text-align: center;
+  color: #ffffff90;
+
 }
