@@ -97,6 +97,23 @@ button {
   
 }
 
+.custom-form .dual-button {
+  display: flex;
+  flex-direction: row;
+  border-radius: 12px;
+  background-color: #e9e9e9;
+}
+
+.custom-form .dual-button button {
+  background: none;
+  width: 40px;
+}
+
+.active-btn {
+  background-color: #0d6efd !important;
+}
+
+
 .custom-form .row {
   display: flex;
   max-width: 100%;
@@ -112,4 +129,9 @@ button {
   text-align: center;
   color: #ffffff90;
 
+}
+
+#camerasContainer {
+  display: flex;
+  flex-direction: column;
 }

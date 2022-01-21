@@ -14,6 +14,12 @@
 </head>
 <body class="d-flex flex-row">
     <div id="controls" class="d-flex flex-column">
+        <div class="custom-form">
+            <div class="dual-button">
+                <button id="scene-0" onclick="changeActiveTo(0)">1</button>
+                <button id="scene-1" onclick="changeActiveTo(1)">2</button>
+            </div>
+        </div>
         <div id="new-node-cont" class="custom-form">
             <h4>New node</h1>
             <input id="n-val" type="number" placeholder="Value">
@@ -50,5 +56,6 @@
         </div>
     </div>
     <div id="helper">WASD - move, +- - zoom, space - show node info</div>
+    <div id="camerasContainer"></div>
 </body>
 </html>

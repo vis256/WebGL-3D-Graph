@@ -1,29 +1,42 @@
 // init
 const controlsElement = document.querySelector("#controls");
+const camerasContainerElement = document.querySelector("#camerasContainer");
 
 let Xsize = window.innerWidth - controlsElement.clientWidth;
 let Ysize = window.innerHeight;
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, Xsize / Ysize, 0.1, 1000 );
-const renderer = new THREE.WebGLRenderer( { antialias: true } );
+// const scene = new THREE.Scene();
+// const camera = new THREE.PerspectiveCamera( 75, Xsize / Ysize, 0.1, 1000 );
+// const renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+const scenes = [new THREE.Scene(), new THREE.Scene()];
+const cameras = [new THREE.PerspectiveCamera( 75, Xsize / (Ysize/2), 0.1, 1000 ), new THREE.PerspectiveCamera( 75, Xsize / (Ysize/2), 0.1, 1000 )];
+const renderers = [new THREE.WebGLRenderer( { antialias: true } ), new THREE.WebGLRenderer( { antialias: true } )]
+var graphNodes = [[], []];
+let edges = [{}, {}];
+let ids = [0, 0];
+
+let activeIndex = 0;
+
+renderers.forEach(renderer => {
+    renderer.setSize( Xsize, (Ysize/2) );
+    camerasContainerElement.appendChild( renderer.domElement );
+});
+
+// renderer.setSize( Xsize, Ysize);
+// document.body.appendChild( renderer.domElement );
+
+// var graphNodes = [];
+// let edges = {};
 
 
-renderer.setSize( Xsize, Ysize);
-document.body.appendChild( renderer.domElement );
+function changeActiveTo(x) {
+    activeIndex = x;
+    document.getElementById("scene-0").classList = `${x == 0 ? "active-btn" : ""}`;
+    document.getElementById("scene-1").classList = `${x == 0 ? "" : "active-btn"}`;
+}
 
-let id = 0;
-var graphNodes = [];
-let edges = {};
-let pointer = new THREE.Vector2;
-
-
-
-//     y
-//     |
-//     |
-//     z-- --x
-
+changeActiveTo(0);
 
 
 const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -33,12 +46,12 @@ function randomColor() {
 }
 
 
-function makeNewNode(color, x, size) {
+function makeNewNode(color, x) {
     const geometry = new THREE.SphereGeometry(0.5, 8, 8);
     const material = new THREE.MeshBasicMaterial( { color: color } );
     const sphere = new THREE.Mesh(geometry, material);
 
-    scene.add(sphere);
+    scenes[activeIndex].add(sphere);
 
     // create tooltip
     const tooltip = document.createElement('div');
@@ -47,21 +60,21 @@ function makeNewNode(color, x, size) {
     let connElemUl = document.createElement('p');
     const nodeId = document.createElement('h1');
 
-    tooltip.id = id;
-    connElemUl.id = `${id}-cn`;
-    nodeValElem.id = `${id}-vl`;
-    nodePosElem.id = `${id}-ps`;
-    nodeId.id = `${id}-id`;
+    tooltip.id = `${activeIndex}-${ids[activeIndex]}`;
+    connElemUl.id = `${activeIndex}-${ids[activeIndex]}-cn`;
+    nodeValElem.id = `${activeIndex}-${ids[activeIndex]}-vl`;
+    nodePosElem.id = `${activeIndex}-${ids[activeIndex]}-ps`;
+    nodeId.id = `${activeIndex}-${ids[activeIndex]}-id`;
 
     nodePosElem.innerHTML = `<strong>x</strong>: ${sphere.position.x} <strong>y</strong>: ${sphere.position.y} <strong>z</strong>: ${sphere.position.z} `;
     nodeValElem.innerHTML = `<strong>Value: </strong>${x}`;
-    nodeId.innerHTML = id;
+    nodeId.innerHTML = ids[activeIndex];
 
     tooltip.classList = "tooltip vis-off";
     nodeId.classList = "tooltip-id";
 
     connElemUl.innerHTML = '→ ';
-    console.log(connElemUl);
+    // console.log(connElemUl);
     tooltip.appendChild(nodeValElem);
     tooltip.appendChild(nodePosElem);
     tooltip.appendChild(connElemUl);
@@ -70,7 +83,7 @@ function makeNewNode(color, x, size) {
     
     document.body.appendChild(tooltip);
     // console.log({x:x});
-    return {id: id++, elem: sphere, tooltip: tooltip, conn: [], val: x};
+    return {id: ids[activeIndex]++, elem: sphere, tooltip: tooltip, conn: [], val: x, plane: activeIndex};
 }
 
 
@@ -81,18 +94,18 @@ function addEdge(x, y) {
     function validY(element) {
         return element.id == y;
     }
-    let elemx = graphNodes.filter( validX )[0];
-    let elemy = graphNodes.filter( validY )[0];
+    let elemx = graphNodes[activeIndex].filter( validX )[0];
+    let elemy = graphNodes[activeIndex].filter( validY )[0];
     elemx.conn.push(elemy);
     elemy.conn.push(elemx);
 
-    document.getElementById(`${x}-cn`).innerHTML += ` ${elemy.val}[${elemy.id}], `;
-    document.getElementById(`${y}-cn`).innerHTML += ` ${elemx.val}[${elemx.id}], `;
+    document.getElementById(`${activeIndex}-${x}-cn`).innerHTML += ` ${elemy.val}[${elemy.id}], `;
+    document.getElementById(`${activeIndex}-${y}-cn`).innerHTML += ` ${elemx.val}[${elemx.id}], `;
 }
 
 function createRandomEdges(p) {
-    for (let i = 0; i < graphNodes.length; i++) {
-        for (let j = i+1; j < graphNodes.length; j++) {
+    for (let i = 0; i < graphNodes[activeIndex].length; i++) {
+        for (let j = i+1; j < graphNodes[activeIndex].length; j++) {
             if (Math.random() < p){
                 addEdge(i,j);
                 createConnection(i,j);
@@ -102,69 +115,35 @@ function createRandomEdges(p) {
 }
 
 
-graphNodes.push( makeNewNode(randomColor(), 5, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 15, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 54, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 2, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 0, 10) );
-// graphNodes.push( makeNewNode(randomColor(), -5, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 51, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 14, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 12, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 13, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 16, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 17, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 18, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 19, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 20, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 21, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 22, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 23, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 24, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 25, 10) );
-// graphNodes.push( makeNewNode(randomColor(), 26, 10) );
-// addEdge(0, 1);
-// addEdge(0, 2);
-// addEdge(2, 1);
-// addEdge(3, 1);
-// addEdge(4, 5);
-// addEdge(7, 8);
-// addEdge(8, 1);
-// addEdge(6, 1);
-// createRandomEdges(0.05);
-
-
-
-
-
-
-
-
+// graphNodes[activeIndex].push( makeNewNode(randomColor(), 5, 10) );
 
 
 function spreadSpheres() {
-    let cycle = 1;
-    const cubeHalfLength = 2;
-    for (let i = 0; i < graphNodes.length; i++) {
-        const sphere = graphNodes[i].elem;
-        let sub = i % 8;
-        if (sub == 0) cycle++;
-        let x, y, z;
-        
-        if (sub > 3) y = cubeHalfLength;
-        else y = -cubeHalfLength;
+    graphNodes.forEach(graphNodesX => {
+        let cycle = 1;
+        const cubeHalfLength = 2;
+        for (let i = 0; i < graphNodesX.length; i++) {
+            const sphere = graphNodesX[i].elem;
+            let sub = i % 8;
+            if (sub == 0) cycle++;
+            let x, y, z;
+            
+            if (sub > 3) y = cubeHalfLength;
+            else y = -cubeHalfLength;
 
-        // 0 1 /2 /3 4 5 /6 /7
-        if (sub < 2 || (sub > 3 && sub < 6)) x = cubeHalfLength;
-        else x = -cubeHalfLength;
+            // 0 1 /2 /3 4 5 /6 /7
+            if (sub < 2 || (sub > 3 && sub < 6)) x = cubeHalfLength;
+            else x = -cubeHalfLength;
 
-        if (sub % 2 == 0) z = cubeHalfLength;
-        else z = -cubeHalfLength;
-        sphere.position.x = x * cycle;
-        sphere.position.y = y * cycle;
-        sphere.position.z = z * cycle;
-        // console.log({x: x, y: y, z: z});
-    }
+            if (sub % 2 == 0) z = cubeHalfLength;
+            else z = -cubeHalfLength;
+            sphere.position.x = x * cycle;
+            sphere.position.y = y * cycle;
+            sphere.position.z = z * cycle;
+            // console.log({x: x, y: y, z: z});
+        }
+    });
+    
 }
 
 function createConnectionBetweenSpheres() {
@@ -172,14 +151,14 @@ function createConnectionBetweenSpheres() {
     let points = [];
     let fid, sid;
     const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-    for (let i = 0; i < graphNodes.length; i++) {
-        const node = graphNodes[i];
+    for (let i = 0; i < graphNodes[activeIndex].length; i++) {
+        const node = graphNodes[activeIndex][i];
         fid = node.id;
         for (let j = 0; j < node.conn.length; j++) {
             // console.log({i:i, j:node.conn[j]});
             points = [];
             sid = node.conn[j];
-            points.push( graphNodes[i].elem.position );
+            points.push( graphNodes[activeIndex][i].elem.position );
             points.push( node.conn[j].elem.position );
             const geometry = new THREE.BufferGeometry().setFromPoints( points );
             const line = new THREE.Line( geometry, material );
@@ -188,7 +167,7 @@ function createConnectionBetweenSpheres() {
     }
 
     connections.forEach(conn => {
-        scene.add(conn);
+        scenes[activeIndex].add(conn);
     });
 }
 
@@ -202,8 +181,8 @@ function createConnection(x, y) {
     }
 
     let points = [];
-    let xelem = graphNodes.filter( validX )[0];
-    let yelem = graphNodes.filter( validY )[0];
+    let xelem = graphNodes[activeIndex].filter( validX )[0];
+    let yelem = graphNodes[activeIndex].filter( validY )[0];
     // console.log({xelem: xelem, yelem: yelem});
     points.push( xelem.elem.position );
     points.push( yelem.elem.position );
@@ -211,14 +190,17 @@ function createConnection(x, y) {
     const material = new THREE.LineBasicMaterial( { color: 0xffff66 } );
     const line = new THREE.Line( geometry, material )
     let key = [x,y].sort().join();
-    edges[key] = line;
-    scene.add(line);
+    edges[activeIndex][key] = line;
+    scenes[activeIndex].add(line);
 }
 
 
 function animate() {
 	requestAnimationFrame( animate );
-	renderer.render( scene, camera );
+	// renderer.render( scene, camera );
+    for (let i = 0; i < renderers.length; i++) {
+        renderers[i].render( scenes[i], cameras[i] );
+    }
 }
 
 var cameraDistToCenter = 10;
@@ -229,24 +211,35 @@ var perpendicularRot = 0;
 
 function updateDataBoxesPosition() {
     let tempV = new THREE.Vector3();
-    for (let i = 0; i < graphNodes.length; i++) {
-        let sphere = graphNodes[i].elem;
-        let tooltip = document.getElementById(`${graphNodes[i].id}`);
-        sphere.getWorldPosition(tempV);
-        tempV.project(camera);
-        
-        const x = (tempV.x *  .5 + 0.5) * Xsize + controlsElement.clientWidth;
-        const y = (tempV.y * -.5 + .5) * Ysize;
-        // console.log(`TRANSFORM ${x} ${y}`);
-        tooltip.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+    for (let j = 0; j < graphNodes.length; j++) {
+        for (let i = 0; i < graphNodes[j].length; i++) {
+            let sphere = graphNodes[j][i].elem;
+            let tooltip = document.getElementById(`${j}-${graphNodes[j][i].id}`);
+            sphere.getWorldPosition(tempV);
+            tempV.project(cameras[j]);
+                
+            const x = (tempV.x *  .5 + 0.5) * Xsize + controlsElement.clientWidth;
+            let y = (tempV.y * -.4 + 0.2) * Ysize;
+            y += Ysize * .5;
+            if (j == 0) {
+                y -= Ysize/2;
+            }
+            // console.log(`TRANSFORM ${x} ${y}`);
+            tooltip.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+        }
     }
+    
 }
 
 function updateDataBoxesContent() {
-    for (let i = 0; i < graphNodes.length; i++) {
-        const node = graphNodes[i];
-        document.getElementById(`${node.id}-vl`).innerHTML = `<strong>Value: </strong>${node.val}`;
-        document.getElementById(`${node.id}-ps`).innerHTML = `<strong>x</strong>: ${node.elem.position.x} <strong>y</strong>: ${node.elem.position.y} <strong>z</strong>: ${node.elem.position.z} `;
+    for (let i = 0; i < graphNodes[activeIndex].length; i++) {
+        const node = graphNodes[activeIndex][i];
+        document.getElementById(`${activeIndex}-${node.id}-vl`).innerHTML = `<strong>Value: </strong>${node.val}`;
+        document.getElementById(`${activeIndex}-${node.id}-ps`).innerHTML = `<strong>x</strong>: ${node.elem.position.x} <strong>y</strong>: ${node.elem.position.y} <strong>z</strong>: ${node.elem.position.z} `;
+        document.getElementById(`${activeIndex}-${node.id}-cn`).innerHTML = '→ ';
+        node.conn.forEach(ind => {
+            document.getElementById(`${activeIndex}-${node.id}-cn`).innerHTML += `${ind.id}, `;
+        });
     }
 }
 
@@ -280,10 +273,14 @@ function hideDataBoxes() {
 
 function moveCamera() {
     // console.log("old", camera.position);
-
-    camera.position.x = cameraDistToCenter * Math.sin( parallelRot * (2 * Math.PI) ) * Math.cos(perpendicularRot * (2 * Math.PI));
-    camera.position.y = cameraDistToCenter * Math.sin(perpendicularRot * (2 * Math.PI));
-    camera.position.z = cameraDistToCenter * Math.cos( parallelRot * (2 * Math.PI) ) * Math.cos(perpendicularRot * (2 * Math.PI));
+    cameras.forEach(camera => {
+        camera.position.x = cameraDistToCenter * Math.sin( parallelRot * (2 * Math.PI) ) * Math.cos(perpendicularRot * (2 * Math.PI));
+        camera.position.y = cameraDistToCenter * Math.sin(perpendicularRot * (2 * Math.PI));
+        camera.position.z = cameraDistToCenter * Math.cos( parallelRot * (2 * Math.PI) ) * Math.cos(perpendicularRot * (2 * Math.PI));
+    });
+    // camera.position.x = cameraDistToCenter * Math.sin( parallelRot * (2 * Math.PI) ) * Math.cos(perpendicularRot * (2 * Math.PI));
+    // camera.position.y = cameraDistToCenter * Math.sin(perpendicularRot * (2 * Math.PI));
+    // camera.position.z = cameraDistToCenter * Math.cos( parallelRot * (2 * Math.PI) ) * Math.cos(perpendicularRot * (2 * Math.PI));
 
 }
 
@@ -317,7 +314,10 @@ function onkeydown(e) {
 
     moveCamera();
     updateDataBoxesPosition();
-    camera.lookAt( new THREE.Vector3(0,0,0) );
+    cameras.forEach(camera => {
+        camera.lookAt( new THREE.Vector3(0,0,0) );
+    });
+    // camera.lookAt( new THREE.Vector3(0,0,0) );
 }
 
 function onkeyup(e) {
@@ -327,15 +327,15 @@ function onkeyup(e) {
 }
 
 
-function onpointermove(event) {
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = (event.clientY / window.innerHeight) * 2 + 1;
-}
+// function onpointermove(event) {
+//     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+//     pointer.y = (event.clientY / window.innerHeight) * 2 + 1;
+// }
 
 
 document.addEventListener('keydown', onkeydown);
 document.addEventListener('keyup', onkeyup);
-document.addEventListener('pointermove', onpointermove);
+// document.addEventListener('pointermove', onpointermove);
 
 // controls functions
 
@@ -346,7 +346,7 @@ function newNodeCreate() {
     if (color == "") {
         color = randomColor();
     }
-    graphNodes.push( makeNewNode(color, val, 10) );
+    graphNodes[activeIndex].push( makeNewNode(color, val, 10) );
     spreadSpheres();
 }
 
@@ -372,7 +372,7 @@ function removeNode() {
     }
 
 
-    let node = graphNodes.filter( validId )[0];
+    let node = graphNodes[activeIndex].filter( validId )[0];
 
     for (let i = 0; i < node.conn.length; i++) {
         const connnode = node.conn[i];
@@ -380,19 +380,19 @@ function removeNode() {
         removeEdge(node, connnode);
 
     }
-    scene.remove(node.elem);
-    graphNodes = graphNodes.filter( invalidId );
-    document.body.removeChild( document.getElementById(id));
+    scenes[activeIndex].remove(node.elem);
+    graphNodes[activeIndex] = graphNodes[activeIndex].filter( invalidId );
+    document.body.removeChild( document.getElementById(`${activeIndex}-${id}`));
 }
 
 function removeEdge(x, y) {
     const invalidX = elem => {return elem.id != x}
     const invalidY = elem => {return elem.id != y}
     let key = [x.id, y.id].sort().join();
-    scene.remove(edges[key]);
+    scenes[activeIndex].remove(edges[activeIndex][key]);
 
-    x.conn.filter( invalidY );
-    y.conn.filter( invalidX );
+    x.conn = x.conn.filter( invalidY );
+    y.conn = y.conn.filter( invalidX );
 }
 
 function deleteEdge() {
@@ -401,7 +401,8 @@ function deleteEdge() {
 
     let x = document.querySelector('#re-x').value;
     let y = document.querySelector('#re-y').value;
-    removeEdge( graphNodes.filter(validX)[0], graphNodes.filter(validY)[0] );
+    removeEdge( graphNodes[activeIndex].filter(validX)[0], graphNodes[activeIndex].filter(validY)[0] );
+    updateDataBoxesContent();
 }
 
 spreadSpheres();
